@@ -26,7 +26,7 @@ import org.greenrobot.greendao.rx.RxTransaction;
 import java.util.Date;
 import java.util.List;
 
-import rx.schedulers.Schedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * A repeatable query returning entities.

@@ -15,6 +15,12 @@
  */
 package org.greenrobot.greendao;
 
+import org.greenrobot.greendao.annotation.apihint.Experimental;
+import org.greenrobot.greendao.async.AsyncSession;
+import org.greenrobot.greendao.database.Database;
+import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.rx.RxTransaction;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,13 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.greenrobot.greendao.annotation.apihint.Experimental;
-import org.greenrobot.greendao.async.AsyncSession;
-import org.greenrobot.greendao.database.Database;
-import org.greenrobot.greendao.query.QueryBuilder;
-import org.greenrobot.greendao.rx.RxTransaction;
+import io.reactivex.schedulers.Schedulers;
 
-import rx.schedulers.Schedulers;
 
 /**
  * DaoSession gives you access to your DAOs, offers convenient persistence methods, and also serves as a session cache.<br>

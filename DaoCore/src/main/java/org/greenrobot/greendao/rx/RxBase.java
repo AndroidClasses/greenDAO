@@ -21,8 +21,8 @@ import org.greenrobot.greendao.annotation.apihint.Internal;
 
 import java.util.concurrent.Callable;
 
-import rx.Observable;
-import rx.Scheduler;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 
 /**
  * Base functionality for Rx, e.g. default scheduler.

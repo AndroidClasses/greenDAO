@@ -23,11 +23,12 @@ import org.greenrobot.greendao.query.Query;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import rx.Observable;
-import rx.Observable.OnSubscribe;
-import rx.Scheduler;
-import rx.Subscriber;
-import rx.exceptions.Exceptions;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Scheduler;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.exceptions.Exceptions;
 
 /**
  * Gets {@link org.greenrobot.greendao.query.Query} results in Rx fashion.
@@ -80,14 +81,14 @@ public class RxQuery<T> extends RxBase {
      * per-entity delivery through Rx.
      */
     public Observable<T> oneByOne() {
-        Observable<T> observable = Observable.create(new OnSubscribe<T>() {
+        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
             @Override
-            public void call(Subscriber<? super T> subscriber) {
+            public void subscribe(@NonNull ObservableEmitter<T> subscriber) throws Exception {
                 try {
                     LazyList<T> lazyList = query.forCurrentThread().listLazyUncached();
                     try {
                         for (T entity : lazyList) {
-                            if (subscriber.isUnsubscribed()) {
+                            if (subscriber.isDisposed()) {
                                 break;
                             }
                             subscriber.onNext(entity);
@@ -95,8 +96,8 @@ public class RxQuery<T> extends RxBase {
                     } finally {
                         lazyList.close();
                     }
-                    if (!subscriber.isUnsubscribed()) {
-                        subscriber.onCompleted();
+                    if (!subscriber.isDisposed()) {
+                        subscriber.onComplete();
                     }
                 } catch (Throwable e) {
                     Exceptions.throwIfFatal(e);

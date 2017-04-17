@@ -22,21 +22,21 @@ import org.greenrobot.greendao.annotation.apihint.Experimental;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import rx.Observable;
-import rx.Scheduler;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 
 /**
  * Like {@link AbstractDao} but with Rx support. Most methods from AbstractDao are present here, but will return an
  * {@link Observable}. Modifying operations return the given entities, so they can be further processed in Rx.
  * <p>
- * Instances of RxDao may have an default {@link rx.Scheduler}, which is used to configure returned observables with
+ * Instances of RxDao may have an default {@link io.reactivex.Scheduler}, which is used to configure returned observables with
  * {@link Observable#subscribeOn(Scheduler)} (see {@link AbstractDao#rxPlain()}, which uses the IO scheduler).
  *
  * Note: DO NOT call more than one data modification operation when you can use a transaction instead (see
  * {@link RxTransaction}. Individual calls use a transaction each and are much slower.
  *
  * @param <T> Entity type
- * @param <K> Primary key (PK) type; use Void if entity does not have exactly one PK
+ * @param <K> Primary key (PK) type; use NullStub if entity does not have exactly one PK
  * @see AbstractDao#rxPlain()
  */
 @Experimental
@@ -288,12 +288,12 @@ public class RxDao<T, K> extends RxBase {
      * Rx version of {@link AbstractDao#delete(Object)} returning an Observable.
      */
     @Experimental
-    public Observable<Void> delete(final T entity) {
-        return wrap(new Callable<Void>() {
+    public Observable<NullStub> delete(final T entity) {
+        return wrap(new Callable<NullStub>() {
             @Override
-            public Void call() throws Exception {
+            public NullStub call() throws Exception {
                 dao.delete(entity);
-                return null;
+                return NullStub.NULL;
             }
         });
     }
@@ -302,12 +302,12 @@ public class RxDao<T, K> extends RxBase {
      * Rx version of {@link AbstractDao#deleteByKey(Object)} returning an Observable.
      */
     @Experimental
-    public Observable<Void> deleteByKey(final K key) {
-        return wrap(new Callable<Void>() {
+    public Observable<NullStub> deleteByKey(final K key) {
+        return wrap(new Callable<NullStub>() {
             @Override
-            public Void call() throws Exception {
+            public NullStub call() throws Exception {
                 dao.deleteByKey(key);
-                return null;
+                return NullStub.NULL;
             }
         });
     }
@@ -316,12 +316,12 @@ public class RxDao<T, K> extends RxBase {
      * Rx version of {@link AbstractDao#deleteAll()} returning an Observable.
      */
     @Experimental
-    public Observable<Void> deleteAll() {
-        return wrap(new Callable<Void>() {
+    public Observable<NullStub> deleteAll() {
+        return wrap(new Callable<NullStub>() {
             @Override
-            public Void call() throws Exception {
+            public NullStub call() throws Exception {
                 dao.deleteAll();
-                return null;
+                return NullStub.NULL;
             }
         });
     }
@@ -330,12 +330,12 @@ public class RxDao<T, K> extends RxBase {
      * Rx version of {@link AbstractDao#deleteInTx(Iterable)} returning an Observable.
      */
     @Experimental
-    public Observable<Void> deleteInTx(final Iterable<T> entities) {
-        return wrap(new Callable<Void>() {
+    public Observable<NullStub> deleteInTx(final Iterable<T> entities) {
+        return wrap(new Callable<NullStub>() {
             @Override
-            public Void call() throws Exception {
+            public NullStub call() throws Exception {
                 dao.deleteInTx(entities);
-                return null;
+                return NullStub.NULL;
             }
         });
     }
@@ -344,12 +344,12 @@ public class RxDao<T, K> extends RxBase {
      * Rx version of {@link AbstractDao#deleteInTx(Object[])} returning an Observable.
      */
     @Experimental
-    public Observable<Void> deleteInTx(final T... entities) {
-        return wrap(new Callable<Void>() {
+    public Observable<NullStub> deleteInTx(final T... entities) {
+        return wrap(new Callable<NullStub>() {
             @Override
-            public Void call() throws Exception {
+            public NullStub call() throws Exception {
                 dao.deleteInTx(entities);
-                return null;
+                return NullStub.NULL;
             }
         });
     }
@@ -358,12 +358,12 @@ public class RxDao<T, K> extends RxBase {
      * Rx version of {@link AbstractDao#deleteByKeyInTx(Iterable)} returning an Observable.
      */
     @Experimental
-    public Observable<Void> deleteByKeyInTx(final Iterable<K> keys) {
-        return wrap(new Callable<Void>() {
+    public Observable<NullStub> deleteByKeyInTx(final Iterable<K> keys) {
+        return wrap(new Callable<NullStub>() {
             @Override
-            public Void call() throws Exception {
+            public NullStub call() throws Exception {
                 dao.deleteByKeyInTx(keys);
-                return null;
+                return NullStub.NULL;
             }
         });
     }
@@ -372,12 +372,12 @@ public class RxDao<T, K> extends RxBase {
      * Rx version of {@link AbstractDao#deleteByKeyInTx(Object[])} returning an Observable.
      */
     @Experimental
-    public Observable<Void> deleteByKeyInTx(final K... keys) {
-        return wrap(new Callable<Void>() {
+    public Observable<NullStub> deleteByKeyInTx(final K... keys) {
+        return wrap(new Callable<NullStub>() {
             @Override
-            public Void call() throws Exception {
+            public NullStub call() throws Exception {
                 dao.deleteByKeyInTx(keys);
-                return null;
+                return NullStub.NULL;
             }
         });
     }

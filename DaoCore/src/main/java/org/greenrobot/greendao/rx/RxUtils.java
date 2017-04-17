@@ -20,15 +20,16 @@ import org.greenrobot.greendao.annotation.apihint.Internal;
 
 import java.util.concurrent.Callable;
 
-import rx.Observable;
-import rx.functions.Func0;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+
 
 @Internal
 class RxUtils {
     /** As of RxJava 1.1.7, Observable.fromCallable is still @Beta, so just in case... */
     @Internal
     static <T> Observable<T> fromCallable(final Callable<T> callable) {
-        return Observable.defer(new Func0<Observable<T>>() {
+        return Observable.defer(new Callable<ObservableSource<? extends T>>() {
 
             @Override
             public Observable<T> call() {

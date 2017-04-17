@@ -21,8 +21,8 @@ import org.greenrobot.greendao.annotation.apihint.Experimental;
 
 import java.util.concurrent.Callable;
 
-import rx.Observable;
-import rx.Scheduler;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 
 /**
  * Allows to do transactions using Rx Observable.
@@ -44,12 +44,12 @@ public class RxTransaction extends RxBase {
      * Rx version of {@link AbstractDaoSession#runInTx(Runnable)} returning an Observable.
      */
     @Experimental
-    public Observable<Void> run(final Runnable runnable) {
-        return wrap(new Callable<Void>() {
+    public Observable<NullStub> run(final Runnable runnable) {
+        return wrap(new Callable<NullStub>() {
             @Override
-            public Void call() throws Exception {
+            public NullStub call() throws Exception {
                 daoSession.runInTx(runnable);
-                return null;
+                return NullStub.NULL;
             }
         });
     }
