@@ -21,14 +21,15 @@ package org.greenrobot.greendao.daotest.rx;
 import org.greenrobot.greendao.daotest.DaoMaster;
 import org.greenrobot.greendao.daotest.DaoSession;
 import org.greenrobot.greendao.daotest.TestEntity;
+import org.greenrobot.greendao.rx.NullStub;
 import org.greenrobot.greendao.rx.RxTransaction;
 import org.greenrobot.greendao.test.AbstractDaoSessionTest;
 
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
 
 public class RxTransactionTest extends AbstractDaoSessionTest<DaoMaster, DaoSession> {
 
@@ -45,7 +46,7 @@ public class RxTransactionTest extends AbstractDaoSessionTest<DaoMaster, DaoSess
     }
 
     public void testRun() {
-        Observable<Void> observable = rxTx.run(new Runnable() {
+        Observable<NullStub> observable = rxTx.run(new Runnable() {
             @Override
             public void run() {
                 TestEntity entity = insertEntity("hello");
@@ -53,8 +54,8 @@ public class RxTransactionTest extends AbstractDaoSessionTest<DaoMaster, DaoSess
                 daoSession.update(entity);
             }
         });
-        TestSubscriber<Void> testSubscriber = assertTxExecuted(observable);
-        assertNull(testSubscriber.getOnNextEvents().get(0));
+        TestObserver<NullStub> testSubscriber = assertTxExecuted(observable);
+        assertNull(testSubscriber.values().get(0));
     }
 
     public void testCall() {
@@ -77,13 +78,13 @@ public class RxTransactionTest extends AbstractDaoSessionTest<DaoMaster, DaoSess
                 return "Just checking";
             }
         });
-        TestSubscriber<String> testSubscriber = assertTxExecuted(observable);
-        assertEquals("Just checking", testSubscriber.getOnNextEvents().get(0));
+        TestObserver<String> testSubscriber = assertTxExecuted(observable);
+        assertEquals("Just checking", testSubscriber.values().get(0));
     }
 
-    private <T> TestSubscriber<T> assertTxExecuted(Observable<T> observable) {
-        TestSubscriber<T> testSubscriber = RxTestHelper.awaitTestSubscriber(observable);
-        assertEquals(1, testSubscriber.getValueCount());
+    private <T> TestObserver<T> assertTxExecuted(Observable<T> observable) {
+        TestObserver<T> testSubscriber = RxTestHelper.awaitTestSubscriber(observable);
+        assertEquals(1, testSubscriber.valueCount());
 
         daoSession.clear();
         List<TestEntity> all = daoSession.getTestEntityDao().loadAll();

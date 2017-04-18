@@ -21,19 +21,18 @@ package org.greenrobot.greendao.daotest.rx;
 import org.greenrobot.greendao.daotest.TestEntity;
 import org.greenrobot.greendao.daotest.TestEntityDao;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
 
 public class RxTestHelper {
-    static <T> TestSubscriber<T> awaitTestSubscriber(Observable<T> observable) {
-        TestSubscriber<T> testSubscriber = new TestSubscriber<>();
+    static <T> TestObserver<T> awaitTestSubscriber(Observable<T> observable) {
+        TestObserver<T> testSubscriber = new TestObserver<>();
         observable.subscribe(testSubscriber);
         testSubscriber.awaitTerminalEvent(3, TimeUnit.SECONDS);
         testSubscriber.assertNoErrors();
-        testSubscriber.assertCompleted();
+        testSubscriber.assertComplete();
         return testSubscriber;
     }
 

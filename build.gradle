@@ -13,6 +13,10 @@ ext {
     minSdkVersion = 7
     targetSdkVersion = 25
 
+    rxbinding2Version = '2.0.0'
+    rxjava2Version = '2.0.8'
+    rxandroid2Version = '2.0.1'
+
     // common dependencies for Android projects (not to be used in example projects for better copy and paste)
     dep = [
             androidPlugin: 'com.android.tools.build:gradle:2.3.1',

@@ -28,7 +28,8 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.10.19'
 
     androidTestCompile 'net.zetetic:android-database-sqlcipher:3.5.4'
-    androidTestCompile 'io.reactivex:rxjava:1.1.7'
+//    androidTestCompile 'io.reactivex:rxjava:1.1.7'
+    androidTestCompile "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava2Version"
 }
 
 uploadArchives.enabled = false

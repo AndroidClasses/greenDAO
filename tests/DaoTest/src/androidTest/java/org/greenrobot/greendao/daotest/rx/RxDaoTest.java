@@ -26,8 +26,9 @@ import org.greenrobot.greendao.test.AbstractDaoTest;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
+
 
 @SuppressWarnings("unchecked")
 public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> {
@@ -45,15 +46,15 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
     }
 
     public void testScheduler() {
-        TestSubscriber<List<TestEntity>> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.loadAll());
-        Thread lastSeenThread = testSubscriber.getLastSeenThread();
+        TestObserver<List<TestEntity>> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.loadAll());
+        Thread lastSeenThread = testSubscriber.lastThread();
         assertNotSame(lastSeenThread, Thread.currentThread());
     }
 
     public void testNoScheduler() {
         RxDao<TestEntity, Long> rxDaoNoScheduler = dao.rxPlain();
-        TestSubscriber<List<TestEntity>> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDaoNoScheduler.loadAll());
-        Thread lastSeenThread = testSubscriber.getLastSeenThread();
+        TestObserver<List<TestEntity>> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDaoNoScheduler.loadAll());
+        Thread lastSeenThread = testSubscriber.lastThread();
         assertSame(lastSeenThread, Thread.currentThread());
     }
 
@@ -61,9 +62,9 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
         insertEntity("foo");
         insertEntity("bar");
 
-        TestSubscriber<List<TestEntity>> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.loadAll());
-        assertEquals(1, testSubscriber.getValueCount());
-        List<TestEntity> entities = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<List<TestEntity>> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.loadAll());
+        assertEquals(1, testSubscriber.valueCount());
+        List<TestEntity> entities = testSubscriber.values().get(0);
 
         // Order of entities is unspecified
         int foo = 0, bar = 0;
@@ -83,17 +84,17 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
 
     public void testLoad() {
         TestEntity foo = insertEntity("foo");
-        TestSubscriber<TestEntity> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.load(foo.getId()));
-        assertEquals(1, testSubscriber.getValueCount());
-        TestEntity foo2 = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<TestEntity> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.load(foo.getId()));
+        assertEquals(1, testSubscriber.valueCount());
+        TestEntity foo2 = testSubscriber.values().get(0);
         assertEquals(foo.getSimpleStringNotNull(), foo2.getSimpleStringNotNull());
     }
 
     public void testLoad_noResult() {
-        TestSubscriber<TestEntity> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.load(42));
-        assertEquals(1, testSubscriber.getValueCount());
+        TestObserver<TestEntity> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.load(42));
+        assertEquals(1, testSubscriber.valueCount());
         // Should we really propagate null through Rx?
-        assertNull(testSubscriber.getOnNextEvents().get(0));
+        assertNull(testSubscriber.values().get(0));
     }
 
     public void testRefresh() {
@@ -105,9 +106,9 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
 
     public void testInsert() {
         TestEntity foo = RxTestHelper.createEntity("foo");
-        TestSubscriber<TestEntity> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.insert(foo));
-        assertEquals(1, testSubscriber.getValueCount());
-        TestEntity foo2 = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<TestEntity> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.insert(foo));
+        assertEquals(1, testSubscriber.valueCount());
+        TestEntity foo2 = testSubscriber.values().get(0);
         assertSame(foo, foo2);
 
         List<TestEntity> all = dao.loadAll();
@@ -118,9 +119,9 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
     public void testInsertInTx() {
         TestEntity foo = RxTestHelper.createEntity("foo");
         TestEntity bar = RxTestHelper.createEntity("bar");
-        TestSubscriber<Object[]> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.insertInTx(foo, bar));
-        assertEquals(1, testSubscriber.getValueCount());
-        Object[] array = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<Object[]> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.insertInTx(foo, bar));
+        assertEquals(1, testSubscriber.valueCount());
+        Object[] array = testSubscriber.values().get(0);
         assertSame(foo, array[0]);
         assertSame(bar, array[1]);
 
@@ -136,9 +137,9 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
         List<TestEntity> list = new ArrayList<>();
         list.add(foo);
         list.add(bar);
-        TestSubscriber<List<TestEntity>> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.insertInTx(list));
-        assertEquals(1, testSubscriber.getValueCount());
-        List<TestEntity> result = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<List<TestEntity>> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.insertInTx(list));
+        assertEquals(1, testSubscriber.valueCount());
+        List<TestEntity> result = testSubscriber.values().get(0);
         assertSame(foo, result.get(0));
         assertSame(bar, result.get(1));
 
@@ -211,9 +212,9 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
     public void testUpdate() {
         TestEntity foo = insertEntity("foo");
         foo.setSimpleString("foofoo");
-        TestSubscriber testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.update(foo));
-        assertEquals(1, testSubscriber.getValueCount());
-        assertSame(foo, testSubscriber.getOnNextEvents().get(0));
+        TestObserver testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.update(foo));
+        assertEquals(1, testSubscriber.valueCount());
+        assertSame(foo, testSubscriber.values().get(0));
         List<TestEntity> testEntities = dao.loadAll();
         assertEquals(1, testEntities.size());
         assertNotSame(foo, testEntities.get(0));
@@ -245,9 +246,9 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
     }
 
     private void assertUpdatedEntity(TestEntity foo, Observable<TestEntity> observable) {
-        TestSubscriber<TestEntity> testSubscriber = RxTestHelper.awaitTestSubscriber(observable);
-        assertEquals(1, testSubscriber.getValueCount());
-        TestEntity bar = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<TestEntity> testSubscriber = RxTestHelper.awaitTestSubscriber(observable);
+        assertEquals(1, testSubscriber.valueCount());
+        TestEntity bar = testSubscriber.values().get(0);
         assertSame(foo, bar);
 
         List<TestEntity> all = dao.loadAll();
@@ -256,9 +257,9 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
     }
 
     private void assertUpdatedEntities(TestEntity foo, TestEntity bar, Observable<Object[]> observable) {
-        TestSubscriber<Object[]> testSubscriber = RxTestHelper.awaitTestSubscriber(observable);
-        assertEquals(1, testSubscriber.getValueCount());
-        Object[] array = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<Object[]> testSubscriber = RxTestHelper.awaitTestSubscriber(observable);
+        assertEquals(1, testSubscriber.valueCount());
+        Object[] array = testSubscriber.values().get(0);
         assertSame(foo, array[0]);
         assertSame(bar, array[1]);
 
@@ -272,9 +273,9 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
         TestEntity foo = entities.get(0);
         TestEntity bar = entities.get(1);
 
-        TestSubscriber<List<TestEntity>> testSubscriber = RxTestHelper.awaitTestSubscriber(observable);
-        assertEquals(1, testSubscriber.getValueCount());
-        List<TestEntity> result = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<List<TestEntity>> testSubscriber = RxTestHelper.awaitTestSubscriber(observable);
+        assertEquals(1, testSubscriber.valueCount());
+        List<TestEntity> result = testSubscriber.values().get(0);
         assertSame(foo, result.get(0));
         assertSame(bar, result.get(1));
 
@@ -335,17 +336,17 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
     }
 
     private void assertDeleted(Observable<Void> observable) {
-        TestSubscriber testSubscriber = RxTestHelper.awaitTestSubscriber(observable);
-        assertEquals(1, testSubscriber.getValueCount());
-        assertNull(testSubscriber.getOnNextEvents().get(0));
+        TestObserver testSubscriber = RxTestHelper.awaitTestSubscriber(observable);
+        assertEquals(1, testSubscriber.valueCount());
+        assertNull(testSubscriber.values().get(0));
         assertEquals(0, dao.count());
     }
 
     public void testCount() {
         insertEntity("foo");
-        TestSubscriber<Long> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.count());
-        assertEquals(1, testSubscriber.getValueCount());
-        Long count = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<Long> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.count());
+        assertEquals(1, testSubscriber.valueCount());
+        Long count = testSubscriber.values().get(0);
         assertEquals(1L, (long) count);
     }
 
