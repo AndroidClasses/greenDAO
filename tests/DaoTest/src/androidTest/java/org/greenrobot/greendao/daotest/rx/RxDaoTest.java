@@ -20,6 +20,7 @@ package org.greenrobot.greendao.daotest.rx;
 
 import org.greenrobot.greendao.daotest.TestEntity;
 import org.greenrobot.greendao.daotest.TestEntityDao;
+import org.greenrobot.greendao.rx.NullStub;
 import org.greenrobot.greendao.rx.RxDao;
 import org.greenrobot.greendao.test.AbstractDaoTest;
 
@@ -90,11 +91,14 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
         assertEquals(foo.getSimpleStringNotNull(), foo2.getSimpleStringNotNull());
     }
 
+    // todo: null is not allowed in rxjava2, then how to test such case that loads no result
+    // querying? The Observable returned by rxDao.laod(42) causes NullPointerException when being subscribing.
     public void testLoad_noResult() {
-        TestObserver<TestEntity> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.load(42));
-        assertEquals(1, testSubscriber.valueCount());
+//        TestObserver<TestEntity> testSubscriber = RxTestHelper.awaitTestSubscriber(rxDao.load(42));
+        TestObserver<TestEntity> testSubscriber = RxTestHelper.awaitTestNullObserver(rxDao.load(42));
+        assertEquals(0, testSubscriber.valueCount());
         // Should we really propagate null through Rx?
-        assertNull(testSubscriber.values().get(0));
+//        assertNull(testSubscriber.values().get(0));
     }
 
     public void testRefresh() {
@@ -338,7 +342,8 @@ public class RxDaoTest extends AbstractDaoTest<TestEntityDao, TestEntity, Long> 
     private void assertDeleted(Observable<Void> observable) {
         TestObserver testSubscriber = RxTestHelper.awaitTestSubscriber(observable);
         assertEquals(1, testSubscriber.valueCount());
-        assertNull(testSubscriber.values().get(0));
+//        assertNull(testSubscriber.values().get(0));
+        assertEquals(NullStub.NULL, testSubscriber.values().get(0));
         assertEquals(0, dao.count());
     }
 

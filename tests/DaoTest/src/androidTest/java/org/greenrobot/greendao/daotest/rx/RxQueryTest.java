@@ -89,6 +89,7 @@ public class RxQueryTest extends AbstractDaoSessionTest<DaoMaster, DaoSession> {
         }
     }
 
+    // todo: double check if the equivalence of the test case between rxjava2 and rxjava
     public void testOneByOneUnsubscribe() {
         insertEntities(1000);
         RxQuery<TestEntity> bigQuery = daoSession.getTestEntityDao().queryBuilder().rx();
@@ -97,6 +98,9 @@ public class RxQueryTest extends AbstractDaoSessionTest<DaoMaster, DaoSession> {
         observable.subscribe(testSubscriber);
 //        subscription.unsubscribe();
 //        testSubscriber.assertUnsubscribed();
+        testSubscriber.dispose();
+        assertTrue(testSubscriber.isDisposed());
+
         int count = testSubscriber.valueCount();
         testSubscriber.awaitTerminalEvent(100, TimeUnit.MILLISECONDS);
         int count2 = testSubscriber.valueCount();

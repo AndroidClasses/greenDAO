@@ -27,6 +27,17 @@ import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 
 public class RxTestHelper {
+    static <T> TestObserver<T> awaitTestNullObserver(Observable<T> observable) {
+        TestObserver<T> testObserver = new TestObserver<>();
+        observable.subscribe(testObserver);
+        testObserver.awaitTerminalEvent(3, TimeUnit.SECONDS);
+        testObserver.assertError(NullPointerException.class);
+        testObserver.assertNotComplete();
+//        testObserver.assertNoErrors();
+//        testObserver.assertComplete();
+        return testObserver;
+    }
+
     static <T> TestObserver<T> awaitTestSubscriber(Observable<T> observable) {
         TestObserver<T> testSubscriber = new TestObserver<>();
         observable.subscribe(testSubscriber);

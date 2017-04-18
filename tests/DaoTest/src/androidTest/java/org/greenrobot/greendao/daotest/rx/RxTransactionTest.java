@@ -55,7 +55,9 @@ public class RxTransactionTest extends AbstractDaoSessionTest<DaoMaster, DaoSess
             }
         });
         TestObserver<NullStub> testSubscriber = assertTxExecuted(observable);
-        assertNull(testSubscriber.values().get(0));
+//        assertNull(testSubscriber.values().get(0));
+        testSubscriber.assertValueCount(1);
+        assertEquals(NullStub.NULL, testSubscriber.values().get(0));
     }
 
     public void testCall() {
